@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบจดบันทึกหวย PRO v1</title>
+  <title>ระบบจดบันทึกหวย PRO v1 (FINAL)</title>
   <style>
     :root {
       --primary: #2c3e50;
@@ -69,7 +69,7 @@
 
 <div class="container">
   <div class="card">
-    <h2>📝 ระบบจดบันทึกหวย PRO</h2>
+    <h2>📝 ระบบจดบันทึกหวย PRO (FINAL)</h2>
     
     <div class="tabs">
       <button class="tab-btn active" onclick="showTab('entry')">คีย์ข้อมูล</button>
@@ -167,6 +167,9 @@
 <div id="toast"></div>
 
 <script>
+  // ==========================================================
+  // ⚠️ ขั้นตอนสำคัญ: นำ URL ที่ได้จากการ Deploy ใน Apps Script มาใส่ตรงนี้
+  // ==========================================================
   const API_URL = "https://script.google.com/macros/s/AKfycbwU0Bk4XlVJ1T2kUlcuQEmTsXO9x9CVCgL87R2AQCzuH9UsqT6qLSfFjAAJOF2UY37l/exec";
 
   function showTab(tabName) {
@@ -177,6 +180,11 @@
   }
 
   async function submitData() {
+    if (API_URL.includes("ใส่ URL")) {
+      alert("กรุณาใส่ Web App URL ในไฟล์ HTML ก่อนใช้งานครับ");
+      return;
+    }
+
     const btn = document.getElementById('submitBtn');
     const payload = {
       customerName: document.getElementById('customerName').value,
@@ -198,15 +206,19 @@
     btn.innerText = "กำลังบันทึก...";
 
     try {
-      await fetch(API_URL, {
+      // ใช้ fetch แบบ POST
+      const response = await fetch(API_URL, {
         method: "POST",
-        mode: "no-cors",
+        mode: "no-cors", // สำคัญมากสำหรับ Google Apps Script
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      showToast("บันทึกสำเร็จ ✓");
+      
+      showToast("บันทึกสำเร็จ ✓ (ข้อมูลกำลังส่งไปยัง Sheet)");
       resetForm();
     } catch (e) {
-      showToast("เกิดข้อผิดพลาดในการบันทึก");
+      console.error(e);
+      showToast("เกิดข้อผิดพลาดในการบันทึก: " + e.message);
     } finally {
       btn.disabled = false;
       btn.innerText = "บันทึกข้อมูล";
@@ -222,6 +234,7 @@
   }
 
   async function loadSummary() {
+    if (API_URL.includes("ใส่ URL")) return;
     const body = document.getElementById('summaryBody');
     const loading = document.getElementById('summaryLoading');
     body.innerHTML = "";
@@ -257,6 +270,7 @@
   }
 
   async function searchData() {
+    if (API_URL.includes("ใส่ URL")) return;
     const query = document.getElementById('searchQuery').value;
     const resultsDiv = document.getElementById('searchResults');
     if (!query) return;
@@ -291,6 +305,7 @@
   }
 
   async function loadTopNumbers() {
+    if (API_URL.includes("ใส่ URL")) return;
     const list = document.getElementById('topNumbersList');
     list.innerHTML = "<div class='loading'>กำลังวิเคราะห์...</div>";
 
